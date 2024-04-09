@@ -1,5 +1,5 @@
 'use client'
-import { ThemeSwitcher } from '@/components/ThemeSwitcher/component'
+import { ThemeSwitcher } from '@/components/primitives/ThemeSwitcher/component'
 
 export const Icon = () => (
     <span className="inline-flex items-center justify-center p-2 bg-indigo-500 rounded-md shadow-lg">
