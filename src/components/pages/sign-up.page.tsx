@@ -8,6 +8,7 @@ import { Github, Computer } from 'lucide-react'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/sdcn/form'
 import { Input } from '@/sdcn/input'
 import { Button } from '@/sdcn/button'
+import { addUser } from '@/providers/users-service.provider'
 
 // @TODO: Adicionar mask formatter para CPF 
 export const LoginForm = () => {
@@ -30,8 +31,15 @@ export const LoginForm = () => {
         }
     })
 
-    function onSubmit(values: formSchema) {
-        console.log(values)
+    async function onSubmit(values: formSchema) {
+        const payload = {
+            name: values.email.split('@')[0],
+            email: values.email, 
+            password: values.password,
+            document: values.document
+        }
+        const added = await addUser(payload)
+        console.log('User added->', added)
     }
 
     return (

@@ -24,6 +24,7 @@ export const authUser = async (auth: AuthDTO) => {
 export const addUser = async (user: typeof users_db[0]) => {
     await waitTime(200); 
     users_db.push(user)
+    return user
 }
 
 export const getUser = async (email: string) => {
@@ -33,6 +34,8 @@ export const getUser = async (email: string) => {
 
 const pageLimit = 5
 export const getUsers = async (page: number = 1) => {
+    console.log(users_db)
+    return users_db
     await waitTime(100); 
     const offset = (page - 1) * pageLimit
     const end = page * pageLimit
