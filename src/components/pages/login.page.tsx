@@ -1,21 +1,33 @@
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { z } from '@/lib/pt-zod'
+import Link from 'next/link'
+import { Github, Computer } from 'lucide-react'
 
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/shadcn/form'
-import { Input } from '@/shadcn/input'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/sdcn/form'
+import { Input } from '@/sdcn/input'
+import { Button } from '@/sdcn/button'
 
+// @TODO: Adicionar mask formatter para CPF 
 export const LoginForm = () => {
     const schema = z.object({
-        email: z.string().min(8).max(30),
-        password: z.string().min(8).max(30)
+        email: z.string().email(),
+        password: z.string().min(8).max(30),
+        confirmPassword: z.string().min(8).max(30),
+        document: z.string().min(11).max(15)
+    }).refine((data) => data.password === data.confirmPassword, {
+        message: "Senha de confirmação não corresponde",
+        path: ['confirmPassword']
     })
 
     type formSchema = z.infer<typeof schema>
 
     const form = useForm<formSchema>({
-        resolver: zodResolver(schema)
+        resolver: zodResolver(schema),
+        defaultValues: {
+            email: '', password: '', document: '', confirmPassword: ''
+        }
     })
 
     function onSubmit(values: formSchema) {
@@ -24,26 +36,68 @@ export const LoginForm = () => {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-4'>
                 <FormField
                     control={form.control}
                     name="email"
-                    render={({ field }) => (
-                        <Input placeholder="username" {...field} />
-                        // <FormItem>
-                        //     <FormLabel>
-                        //         Username
-                        //     </FormLabel>
-                        //     <FormControl>
-                        //         <Input placeholder="username" {...field} />
-                        //     </FormControl>
-                        //     <FormDescription>
-                        //         Insert your email
-                        //     </FormDescription>
-                        //     {/* <FormMessage /> */}
-                        // </FormItem>
-                    )}
+                    render={({ field, formState }) => {
+                        const hasError = !!formState.errors.email;
+                        return (
+                            <FormItem>
+                                <FormControl>
+                                    <Input error={hasError} placeholder="E-mail" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )
+                    }}
                 />
+                <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field, formState }) => {
+                        const hasError = !!formState.errors.password;
+                        return (
+                            <FormItem>
+                                <FormControl>
+                                    <Input type="password" error={hasError} placeholder="Password" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )
+                    }}
+                />
+                <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field, formState }) => {
+                        const hasError = !!formState.errors.confirmPassword;
+                        return (
+                            <FormItem>
+                                <FormControl>
+                                    <Input type="password" error={hasError} placeholder="Confirm password" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )
+                    }}
+                />
+                <FormField
+                    control={form.control}
+                    name="document"
+                    render={({ field, formState }) => {
+                        const hasError = !!formState.errors.document;
+                        return (
+                            <FormItem>
+                                <FormControl>
+                                    <Input error={hasError} placeholder="Document" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )
+                    }}
+                />
+                <Button type="submit" variant='default'>Sign up</Button>
             </form>
         </Form>
     )
@@ -51,18 +105,42 @@ export const LoginForm = () => {
 
 export const Page = () => {
     return (
-        <section id='content' className='flex flex-col min-h-svh bg-gray-50 p-4'>
-            <header className="flex justify-end items-center h-[32px] bg-red-200">
-                <span className='text-slate-800 font-semibold'>Login</span>
-            </header>
-
-            <section id='page-content' className="bg-purple-200 grow">
-                <div id='content-top' className="mt-4 bg-slate-400">
+        <section id='main' className='flex flex-col min-h-svh items-center p-4 '>
+            <section id='page-content' className="grow flex flex-col gap-4 w-full max-w-md">
+                <div className="flex justify-end items-center h-[32px]">
+                    <Link href="/login">
+                        <span className='text-slate-800 font-semibold'>Login</span>
+                    </Link>
+                </div>
+                <div id='top' className="mt-4">
                     <h1 className="text-slate-800 text-lg font-bold">Sign up</h1>
                 </div>
-                <div id='content-center' className='p-4'>
+                <div id='form' className=''>
                     <LoginForm />
-                    <button type="submit" className="btn">Submete caceta!</button>
+                    <p className='text-slate-900 text-sm text-center mt-6'>Or sign up with social account</p>
+                    <div id='social-auth' className='flex justify-center gap-6 mt-6'>
+                        <Link href="/login">
+                            <Button variant='outline' className='px-8 rounded-full'>
+                                <span className='text-slate-800'>
+                                    <Github />
+                                </span>
+                                <span className='ml-2'>Github</span>
+                            </Button>
+                        </Link>
+                        <Link href="/">
+                            <Button variant='outline' className='px-8 rounded-full'>
+                                <span className='text-slate-800'>
+                                    <Computer />
+                                </span>
+                                <span className='ml-2'>Google</span>
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
+                <div id='footer' className='mt-auto m-auto mb-12 w-[260px]'>
+                    <p className='text-center text-sm'>
+                        By signin up you agree to our stroke <span className='underline'>To our terms of Use</span> and <span className='underline'>Privacy Policy</span>
+                    </p>
                 </div>
             </section>
         </section>
