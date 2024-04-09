@@ -9,10 +9,16 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/sdcn/form
 import { Input } from '@/sdcn/input'
 import { Button } from '@/sdcn/button'
 
+// @TODO: Adicionar mask formatter para CPF 
 export const LoginForm = () => {
     const schema = z.object({
         email: z.string().email(),
-        password: z.string().min(8).max(30)
+        password: z.string().min(8).max(30),
+        confirmPassword: z.string().min(8).max(30),
+        document: z.string().min(11).max(15)
+    }).refine((data) => data.password === data.confirmPassword, {
+        message: "Senha de confirmação não corresponde",
+        path: ['confirmPassword']
     })
 
     type formSchema = z.infer<typeof schema>
@@ -20,7 +26,7 @@ export const LoginForm = () => {
     const form = useForm<formSchema>({
         resolver: zodResolver(schema),
         defaultValues: {
-            email: '', password: ''
+            email: '', password: '', document: '', confirmPassword: ''
         }
     })
 
@@ -61,7 +67,37 @@ export const LoginForm = () => {
                         )
                     }}
                 />
-                <Button type="submit" variant='default'>Login</Button>
+                <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field, formState }) => {
+                        const hasError = !!formState.errors.confirmPassword;
+                        return (
+                            <FormItem>
+                                <FormControl>
+                                    <Input type="password" error={hasError} placeholder="Confirm password" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )
+                    }}
+                />
+                <FormField
+                    control={form.control}
+                    name="document"
+                    render={({ field, formState }) => {
+                        const hasError = !!formState.errors.document;
+                        return (
+                            <FormItem>
+                                <FormControl>
+                                    <Input error={hasError} placeholder="Document" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )
+                    }}
+                />
+                <Button type="submit" variant='default'>Sign up</Button>
             </form>
         </Form>
     )
@@ -72,16 +108,16 @@ export const Page = () => {
         <section id='main' className='flex flex-col min-h-svh items-center p-4 '>
             <section id='page-content' className="grow flex flex-col gap-4 w-full max-w-md">
                 <div className="flex justify-end items-center h-[32px]">
-                    <Link href="/sign-up">
-                        <span className='text-slate-800 font-semibold'>Sign up</span>
+                    <Link href="/login">
+                        <span className='text-slate-800 font-semibold'>Login</span>
                     </Link>
                 </div>
                 <div id='top' className="mt-4">
-                    <h1 className="text-slate-800 text-lg font-bold">Login</h1>
+                    <h1 className="text-slate-800 text-lg font-bold">Sign up</h1>
                 </div>
                 <div id='form' className=''>
                     <LoginForm />
-                    <p className='text-slate-900 text-sm text-center mt-6'>Or login with social account</p>
+                    <p className='text-slate-900 text-sm text-center mt-6'>Or sign up with social account</p>
                     <div id='social-auth' className='flex justify-center gap-6 mt-6'>
                         <Link href="/login">
                             <Button variant='outline' className='px-8 rounded-full'>
